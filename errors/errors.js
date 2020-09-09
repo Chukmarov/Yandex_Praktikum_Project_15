@@ -14,14 +14,6 @@ class MissingFieldError extends Error {
   }
 }
 
-class UserNotFoundError extends Error {
-  constructor(message) {
-      super(message);
-      this.statusCode = 404;
-      this.name = 'UserNotFoundError';
-  }
-}
-
 class NeedAuthorizationError extends Error {
   constructor(message) {
       super(message);
@@ -38,4 +30,4 @@ class NotFoundError extends Error {
   }
 }
 
-module.exports = { ExistError, MissingFieldError, UserNotFoundError, NeedAuthorizationError, NotFoundError };
+module.exports = { ExistError, MissingFieldError, NeedAuthorizationError, NotFoundError };
