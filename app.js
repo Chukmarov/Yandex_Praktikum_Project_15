@@ -38,8 +38,4 @@ app.use((req, res) => {
   res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
 });
 
-app.use((err, req, res, next) => {
-  res.status(err.statusCode).send({ message: err.message });
-});
-
 app.listen(PORT, () => {});
