@@ -26,16 +26,6 @@ module.exports.createUser = (req, res, next) => {
     .then(() => User.findOne({ email }))
     .then((user) => res.send({ data: user }))
     .catch((err) => {next(err)})
-      // if (err.name === 'ValidationError') {
-        // res.status(400).send({ message: err.message });
-      // } else if (err.name === 'UserExist') {
-      //   res.status(409).send({ message: err.message });
-      // } else if (err.name === 'MissingFieldError') {
-      //   res.status(400).send({ message: err.message });
-    //   } else {
-    //     next(err);
-    //   }
-    // });
 };
 
 module.exports.getUsers = (req, res) => {
@@ -49,12 +39,4 @@ module.exports.getUserById = async (req, res, next) => {
     .orFail(new NotFoundError('Этот пользователь отсутсвует в базе'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {next(err)});
-      // if (err.name === 'DocumentNotFoundError') {
-      //   res.status(404).send({ message: 'Данный пользователь отсутсвует в базе' });
-      // } else if (err.name === 'CastError') {
-      //   res.status(400).send({ message: 'Проверьте пожалуйста корректность введенных данных' });
-      // } else {
-      //   next(err);
-      // }
-    // });
 };
