@@ -6,11 +6,11 @@ class ExistError extends Error {
   }
 }
 
-class MissingFieldError extends Error {
+class NotCorrectResponse extends Error {
   constructor(message) {
       super(message);
       this.statusCode = 400;
-      this.name = 'MissingFieldError';
+      this.name = 'NotCorrectResponse';
   }
 }
 
@@ -30,4 +30,4 @@ class NotFoundError extends Error {
   }
 }
 
-module.exports = { ExistError, MissingFieldError, NeedAuthorizationError, NotFoundError };
+module.exports = { ExistError, NotCorrectResponse, NeedAuthorizationError, NotFoundError };
