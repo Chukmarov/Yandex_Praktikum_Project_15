@@ -11,7 +11,7 @@ module.exports.createCard = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Проверьте пожалуйста правильность введеных данных' });
       } else {
-        res.status(500).send({ message: err.message });
+        next(err);
       }
     });
 };
@@ -19,7 +19,7 @@ module.exports.createCard = (req, res) => {
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => next(err));
 };
 
 module.exports.deleteCard = (req, res) => {
@@ -43,7 +43,7 @@ module.exports.deleteCard = (req, res) => {
       } else if (err.name === 'DocumentNotFoundError') {
         res.status(404).send({ message: 'Карточка не найдена, либо была ранее удалена' });
       } else {
-        res.status(500).send({ message: err.message });
+        next(err);
       }
     });
 };

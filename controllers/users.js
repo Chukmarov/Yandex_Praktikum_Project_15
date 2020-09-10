@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const { NotFoundError } = require('../errors/errors');
 
 module.exports.createUser = (req, res) => {
   const {
@@ -36,7 +37,7 @@ module.exports.createUser = (req, res) => {
       } else if (err.name === 'MissingFieldError') {
         res.status(400).send({ message: err.message });
       } else {
-        res.status(500).send({ message: err.message });
+        next(err);
       }
     });
 };
@@ -44,12 +45,12 @@ module.exports.createUser = (req, res) => {
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => next(err));
 };
 
-module.exports.getUserById = (req, res) => {
-  User.findById(req.params.userid)
-    .orFail()
+module.exports.getUserById = async (req, res, next) => {
+ await User.findById(req.params.userid)
+    .orFail(new NotFoundError('Этот пользователь отсутсвует в базе'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
@@ -57,7 +58,7 @@ module.exports.getUserById = (req, res) => {
       } else if (err.name === 'CastError') {
         res.status(400).send({ message: 'Проверьте пожалуйста корректность введенных данных' });
       } else {
-        res.status(500).send({ message: err.message });
+        next(err);
       }
     });
 };
