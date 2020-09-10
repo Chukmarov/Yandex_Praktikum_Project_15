@@ -40,11 +40,15 @@ app.all('/*', (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res.status(statusCode).send({
-    message: statusCode === 500
-      ? 'На сервере произошла ошибка'
-      : message });
+  if (err.name === 'ValidationError'){
+    res.status(400).send({ message: 'Проверьте пожалуйста правильность введеных данных' });
+  }else{
+    const { statusCode = 500, message } = err;
+    res.status(statusCode).send({
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message });
+  }
 });
 
 app.listen(PORT, () => {});

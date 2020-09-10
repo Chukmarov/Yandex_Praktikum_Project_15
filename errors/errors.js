@@ -30,4 +30,12 @@ class NotFoundError extends Error {
   }
 }
 
-module.exports = { ExistError, NotCorrectResponse, NeedAuthorizationError, NotFoundError };
+class RightsError extends Error {
+  constructor(message) {
+      super(message);
+      this.statusCode = 403;
+      this.name = 'RightsError';
+  }
+}
+
+module.exports = { ExistError, NotCorrectResponse, NeedAuthorizationError, NotFoundError, RightsError };
