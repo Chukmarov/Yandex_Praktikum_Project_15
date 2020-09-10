@@ -14,7 +14,7 @@ class NotCorrectResponse extends Error {
   }
 }
 
-class NeedAuthorizationError extends Error {
+class AuthorizationTroubleError extends Error {
   constructor(message) {
       super(message);
       this.statusCode = 401;
@@ -38,4 +38,4 @@ class RightsError extends Error {
   }
 }
 
-module.exports = { ExistError, NotCorrectResponse, NeedAuthorizationError, NotFoundError, RightsError };
+module.exports = { ExistError, NotCorrectResponse, AuthorizationTroubleError, NotFoundError, RightsError };
