@@ -32,7 +32,7 @@ app.use(helmet());
 
 app.use(requestLogger);
 
-app.post('/signin',vcelebrate({
+app.post('/signin',celebrate({
   [Segments.BODY]: Joi.object({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
