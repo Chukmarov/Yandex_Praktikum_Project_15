@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const cardsRouter = require('./routes/cards.js');
 const usersRouter = require('./routes/users.js');
 const { createUser } = require('./controllers/users');
@@ -29,6 +30,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(helmet());
 
+app.use(requestLogger);
+
 app.post('/signin',celebrate({
   [Segments.BODY]: Joi.object({
     email: Joi.string().required().email(),
@@ -49,18 +52,19 @@ app.use(auth);
 
 app.use('/cards', celebrate({
   [Segments.QUERY]: Joi.object({
-    cardid: Joi.objectId(),
+    path: Joi.objectId(),
   })
 }),cardsRouter);
 app.use('/users',celebrate({
   [Segments.QUERY]: Joi.object({
-    userid: Joi.objectId(),
+    path: Joi.objectId(),
   })
 }), usersRouter);
 app.all('/*', (req, res) => {
   throw new NotFoundError('Запрашиваемый ресурс не найден');
 });
 
+app.use(errorLogger);
 app.use(errors());
 app.use((err, req, res, next) => {
   if (err.name === 'ValidationError'){
