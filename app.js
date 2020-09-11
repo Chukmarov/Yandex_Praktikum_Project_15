@@ -10,7 +10,8 @@ const { createUser } = require('./controllers/users');
 const { login } = require('./controllers/login');
 const auth = require('./middlewares/auth');
 const { NotFoundError } = require('./errors/errors');
-
+const { celebrate, Joi, errors, Segments } = require('celebrate');
+Joi.objectId = require('joi-objectid')(Joi);
 const { PORT = 3000 } = process.env;
 
 const app = express();
@@ -28,21 +29,43 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(helmet());
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin',celebrate({
+  [Segments.BODY]: Joi.object({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  })
+}), login);
+app.post('/signup', celebrate({
+  [Segments.BODY]: Joi.object({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+    name: Joi.string().required().min(2).max(30),
+    avatar: Joi.string().required().regex(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/),
+    about: Joi.string().min(2).max(30),
+  })
+}), createUser);
 
 app.use(auth);
 
-app.use('/cards', cardsRouter);
-app.use('/users', usersRouter);
+app.use('/cards', celebrate({
+  [Segments.QUERY]: Joi.object({
+    cardid: Joi.objectId(),
+  })
+}),cardsRouter);
+app.use('/users',celebrate({
+  [Segments.QUERY]: Joi.object({
+    userid: Joi.objectId(),
+  })
+}), usersRouter);
 app.all('/*', (req, res) => {
   throw new NotFoundError('Запрашиваемый ресурс не найден');
 });
 
+app.use(errors());
 app.use((err, req, res, next) => {
   if (err.name === 'ValidationError'){
     res.status(400).send({ message: 'Проверьте пожалуйста правильность введеных данных' });
-  }else{
+  } else {
     const { statusCode = 500, message } = err;
     res.status(statusCode).send({
       message: statusCode === 500
