@@ -1,5 +1,6 @@
 const Card = require('../models/card');
-const { NotFoundError, RightsError} = require('../errors/errors');
+const { NotFoundError } = require('../errors/notFoundError');
+const { RightsError } = require('../errors/rightsError');
 
 module.exports.createCard = (req, res, next) => {
   const { name, link, likes } = req.body;
@@ -8,7 +9,7 @@ module.exports.createCard = (req, res, next) => {
     name, link, owner: req.user._id, likes,
   })
     .then((user) => res.send({ data: user }))
-    .catch((err) => { next(err) })
+    .catch((err) => { next(err); });
 };
 
 module.exports.getCards = (req, res, next) => {
@@ -28,5 +29,5 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .then((card) => Card.findByIdAndRemove(card._id))
     .then((card) => res.send({ data: card }))
-    .catch((err) => { next(err) });
+    .catch((err) => { next(err); });
 };

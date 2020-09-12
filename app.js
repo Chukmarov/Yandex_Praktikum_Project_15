@@ -13,7 +13,7 @@ const usersRouter = require('./routes/users.js');
 const { createUser } = require('./controllers/users');
 const { login } = require('./controllers/login');
 const auth = require('./middlewares/auth');
-const { NotFoundError } = require('./errors/errors');
+const { NotFoundError } = require('./errors/notFoundError');
 
 Joi.objectId = require('joi-objectid')(Joi);
 
@@ -53,9 +53,9 @@ app.post('/signup', celebrate({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
     name: Joi.string().required().min(2).max(30),
-    avatar: Joi.string().required().regex(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/),
+    avatar: Joi.string().required().regex(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/),
     about: Joi.string().min(2).max(30),
-  })
+  }),
 }), createUser);
 
 app.use(auth);
@@ -63,28 +63,29 @@ app.use(auth);
 app.use('/cards', celebrate({
   [Segments.QUERY]: Joi.object({
     path: Joi.objectId(),
-  })
-}),cardsRouter);
-app.use('/users',celebrate({
+  }),
+}), cardsRouter);
+app.use('/users', celebrate({
   [Segments.QUERY]: Joi.object({
     path: Joi.objectId(),
-  })
+  }),
 }), usersRouter);
-app.all('/*', (req, res) => {
+app.all('/*', () => {
   throw new NotFoundError('Запрашиваемый ресурс не найден');
 });
 
 app.use(errorLogger);
 app.use(errors());
 app.use((err, req, res, next) => {
-  if (err.name === 'ValidationError'){
+  if (err.name === 'ValidationError') {
     res.status(400).send({ message: 'Проверьте пожалуйста правильность введеных данных' });
   } else {
     const { statusCode = 500, message } = err;
     res.status(statusCode).send({
       message: statusCode === 500
         ? 'На сервере произошла ошибка'
-        : message });
+        : message,
+    });
   }
 });
 

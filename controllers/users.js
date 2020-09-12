@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
-const { NotFoundError, ExistError, NotCorrectResponse} = require('../errors/errors');
+const { NotFoundError } = require('../errors/notFoundError');
+const { ExistError } = require('../errors/exist');
+const { NotCorrectResponse } = require('../errors/notCorrectResponse');
 
 module.exports.createUser = (req, res, next) => {
   const {
@@ -18,25 +20,25 @@ module.exports.createUser = (req, res, next) => {
       return (bcrypt.hash(req.body.password, 10));
     })
     .then((password) => {
-        const user = User.create({
-          name, about, avatar, email, password,
-        });
-        return user;
-     })
+      const user = User.create({
+        name, about, avatar, email, password,
+      });
+      return user;
+    })
     .then(() => User.findOne({ email }))
     .then((user) => res.send({ data: user }))
-    .catch((err) => {next(err)})
+    .catch((err) => { next(err); });
 };
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
     .catch((err) => next(err));
 };
 
 module.exports.getUserById = async (req, res, next) => {
- await User.findById(req.params.userid)
+  await User.findById(req.params.userid)
     .orFail(new NotFoundError('Этот пользователь отсутсвует в базе'))
     .then((user) => res.send({ data: user }))
-    .catch((err) => {next(err)});
+    .catch((err) => next(err));
 };
