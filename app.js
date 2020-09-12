@@ -1,9 +1,12 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-
+const {
+  celebrate, Joi, errors, Segments,
+} = require('celebrate');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const cardsRouter = require('./routes/cards.js');
 const usersRouter = require('./routes/users.js');
@@ -11,8 +14,9 @@ const { createUser } = require('./controllers/users');
 const { login } = require('./controllers/login');
 const auth = require('./middlewares/auth');
 const { NotFoundError } = require('./errors/errors');
-const { celebrate, Joi, errors, Segments } = require('celebrate');
+
 Joi.objectId = require('joi-objectid')(Joi);
+
 const { PORT = 3000 } = process.env;
 
 const app = express();
@@ -32,11 +36,17 @@ app.use(helmet());
 
 app.use(requestLogger);
 
-app.post('/signin',celebrate({
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
+app.post('/signin', celebrate({
   [Segments.BODY]: Joi.object({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
-  })
+  }),
 }), login);
 app.post('/signup', celebrate({
   [Segments.BODY]: Joi.object({
