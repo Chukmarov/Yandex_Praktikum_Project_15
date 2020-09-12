@@ -71,7 +71,7 @@ app.use('/users', celebrate({
   }),
 }), usersRouter);
 app.all('/*', () => {
-  throw new NotFoundError('Запрашиваемый ресурс не найден');
+  throw new NotFoundError('Запрашиваемый  ресурс  не  найден');
 });
 
 app.use(errorLogger);
