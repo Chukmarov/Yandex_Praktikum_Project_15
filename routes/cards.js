@@ -1,8 +1,8 @@
 const router = require('express').Router(); // вызываем метод Router
-const { createCard, getCards, deleteCard } = require('../controllers/cards');
 const {
   celebrate, Joi, Segments,
 } = require('celebrate');
+const { createCard, getCards, deleteCard } = require('../controllers/cards');
 
 router.post('/', celebrate({
   [Segments.BODY]: Joi.object({
@@ -11,7 +11,7 @@ router.post('/', celebrate({
   }),
 }), createCard);
 router.get('/', getCards);
-router.delete('/:cardid',celebrate({
+router.delete('/:cardid', celebrate({
   [Segments.PARAMS]: Joi.object({
     cardid: Joi.string().hex(),
   }),

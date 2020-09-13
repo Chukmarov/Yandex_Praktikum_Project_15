@@ -24,7 +24,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
 });
 
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -56,7 +55,7 @@ app.post('/signup', celebrate({
 
 app.use(auth);
 
-app.use('/cards',cardsRouter);
+app.use('/cards', cardsRouter);
 app.use('/users', usersRouter);
 app.all('/*', () => {
   throw new NotFoundError('Запрашиваемый  ресурс  не  найден');
