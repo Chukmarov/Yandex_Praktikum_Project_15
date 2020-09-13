@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
@@ -15,8 +14,6 @@ const { login } = require('./controllers/login');
 const auth = require('./middlewares/auth');
 const { NotFoundError } = require('./errors/notFoundError');
 
-Joi.objectId = require('joi-objectid')(Joi);
-
 const { PORT = 3000 } = process.env;
 
 const app = express();
@@ -27,7 +24,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -60,16 +56,8 @@ app.post('/signup', celebrate({
 
 app.use(auth);
 
-app.use('/cards', celebrate({
-  [Segments.QUERY]: Joi.object({
-    path: Joi.objectId(),
-  }),
-}), cardsRouter);
-app.use('/users', celebrate({
-  [Segments.QUERY]: Joi.object({
-    path: Joi.objectId(),
-  }),
-}), usersRouter);
+app.use('/cards',cardsRouter);
+app.use('/users', usersRouter);
 app.all('/*', () => {
   throw new NotFoundError('Запрашиваемый  ресурс  не  найден');
 });
